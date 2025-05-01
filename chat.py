@@ -113,7 +113,7 @@ def call_external_api(user_message, conversation_history):
 
         # --- Make the API call ---
         response = client.chat.completions.create(
-            model="GEMINI-chat",
+            model="gemini-2.5-flash-preview-04-17",
             messages=messages,
             temperature=0.7,
             max_tokens=1000,

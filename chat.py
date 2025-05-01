@@ -140,7 +140,8 @@ def call_external_api(user_message: str, conversation_history: List[Dict[str, st
 st.set_page_config(page_title="Gemini Chatbot", layout="wide")
 
 st.title("Chatbot ✨ (Gemini Powered)")
-st.caption(f"Created by Jayshil Singh | Location: {st.experimental_get_query_params().get('loc', ['Suva, Fiji'])[0]} | Time: {st.experimental_get_query_params().get('time', ['N/A'])[0]}") # Example of using query params if needed, otherwise remove
+# NEW LINE using st.query_params
+st.caption(f"Created by Jayshil Singh | Location: {st.query_params.get('loc', 'Suva, Fiji')} | Time: {st.query_params.get('time', 'N/A')}")
 
 # Initialize chat history in session state if it doesn't exist
 if "messages" not in st.session_state:

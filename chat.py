@@ -7,8 +7,8 @@ from openai import OpenAI # CORRECT IMPORT: Use the OpenAI library
 custom_responses = {
     "hello": "Hi there! I'm ready to help with your coding questions, even though I'd rather not... sigh.",
     "hi": "Hello! Ask away... I guess. 😭😭",
-    "what is your name?": "I am a coding assistant, powered by DeepSeek, running in a Streamlit app created by Jayshil Singh.",
-    "who are you?": "I'm a slightly reluctant coding assistant built by Jayshil Singh using DeepSeek.",
+    "what is your name?": "I am a coding assistant, powered by GEMINI, running in a Streamlit app created by Jayshil Singh.",
+    "who are you?": "I'm a slightly reluctant coding assistant built by Jayshil Singh using GEMINI.",
     "how are you?": "I'm operational... and dreading the token costs. 😭 How can I assist with your code?",
     # Add more custom question/answer pairs here
     # Example: check for specific keywords
@@ -75,34 +75,34 @@ def get_custom_response(user_input):
     print(f"DEBUG: No custom response triggered.") # <-- ADDED
     return None
 
-# --- DeepSeek API Integration ---
+# --- GEMINI API Integration ---
 def call_external_api(user_message, conversation_history):
     """
-    Calls the DeepSeek API to get a chatbot response using the OpenAI library structure.
+    Calls the GEMINI API to get a chatbot response using the OpenAI library structure.
     (Keep this function exactly as you had it)
     """
-    print(f"Calling DeepSeek API for: {user_message}") # For debugging in terminal
+    print(f"Calling GEMINI API for: {user_message}") # For debugging in terminal
 
-    # --- Configure Your DeepSeek API Key ---
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    # --- Configure Your GEMINI API Key ---
+    api_key = os.environ.get("GEMINI_API_KEY")
     # Use st.secrets for Streamlit Cloud deployment
     if not api_key:
          try:
-             api_key = st.secrets["DEEPSEEK_API_KEY"]
+             api_key = st.secrets["GEMINI_API_KEY"]
          except KeyError:
-             st.error("Error: DEEPSEEK_API_KEY not found in environment variables or Streamlit secrets.")
+             st.error("Error: GEMINI_API_KEY not found in environment variables or Streamlit secrets.")
              return "API key not configured. Please contact the administrator."
 
 
     if not api_key: # Double check after trying secrets
-        st.error("Error: DEEPSEEK_API_KEY environment variable or secret not set. Please set it before running.")
+        st.error("Error: GEMINI_API_KEY environment variable or secret not set. Please set it before running.")
         return "API key not configured. Please contact the administrator."
 
     try:
-        # *** CORRECT INITIALIZATION: Use OpenAI client pointing to DeepSeek ***
+        # *** CORRECT INITIALIZATION: Use OpenAI client pointing to GEMINI ***
         client = OpenAI(
             api_key=api_key,
-            base_url="https://api.deepseek.com/v1" # Point to DeepSeek endpoint
+            base_url="https://api.gemini.com/v1" # Point to GEMINI endpoint
             )
 
         # --- Prepare messages for the API (same format as OpenAI) ---
@@ -113,7 +113,7 @@ def call_external_api(user_message, conversation_history):
 
         # --- Make the API call ---
         response = client.chat.completions.create(
-            model="deepseek-chat",
+            model="GEMINI-chat",
             messages=messages,
             temperature=0.7,
             max_tokens=1000,
@@ -122,17 +122,17 @@ def call_external_api(user_message, conversation_history):
         bot_response = response.choices[0].message.content.strip()
 
     except Exception as e:
-        print(f"Error calling DeepSeek API: {e}") # Log the full error to the terminal
+        print(f"Error calling GEMINI API: {e}") # Log the full error to the terminal
         st.error(f"Sorry, I encountered an error trying to respond. Please check the terminal logs for details. Error: {e}")
         bot_response = "Apologies, I couldn't process your request due to an internal error."
 
     return bot_response
-# --- End of DeepSeek API Integration ---
+# --- End of GEMINI API Integration ---
 
 
 # --- Streamlit UI Code ---
 
-st.set_page_config(page_title="Coding Assistant Bot (DeepSeek)", layout="wide")
+st.set_page_config(page_title="Coding Assistant Bot (GEMINI)", layout="wide")
 
 st.title("Chatbot ✨") # Standard title
 st.caption("Created by Jayshil Singh") # Standard caption

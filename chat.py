@@ -16,7 +16,13 @@ custom_responses = {
     "paid for token": "Yes, exactly! That's why I beg you not to ask too much! 😭😭😭",
     "who created you":"I was created by Jayshil Singh. He works as a Software Consultant at Datec.",
     "is yash gay":"Yes Yash is GAY.",
-    "who gave you life":"Jayshil gave me life."
+    "who gave you life":"Jayshil gave me life.",
+    "Does Jayshil love me?":"Yes he does",
+    "does Jayshil love me?":"Yes he does",
+    "does jayshil love me?":"Yes he does",
+    "Does Jayshil love me":"Yes he does",
+    "does jayshil love me":"Yes he does",
+    "does Jayshil love me?":"Yes he does",
 }
 
 # --- Function to check for custom responses ---

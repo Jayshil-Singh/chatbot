@@ -217,96 +217,69 @@ if 'app_user_id' not in st.session_state: st.session_state['app_user_id'] = None
 if 'oauth_state' not in st.session_state: st.session_state['oauth_state'] = None # For CSRF protection
 
 # --- Handle OAuth Callback ---
-# Check query parameters when the script reruns after Google redirect
-query_params = st.query_params # Use the modern way
-
+query_params = st.query_params
 auth_code = query_params.get("code")
 returned_state = query_params.get("state")
+stored_state = st.session_state.get('oauth_state') # Get state stored before redirect
 
-# Only process callback if code exists and we were expecting a callback (state exists in session)
-if auth_code and st.session_state.get('oauth_state'):
-    print("DEBUG: OAuth callback detected.")
-    # Verify CSRF state token
-    if returned_state != st.session_state['oauth_state']:
+print(f"\nDEBUG CALLBACK: Query Params Received: code='{auth_code}', state='{returned_state}'")
+print(f"DEBUG CALLBACK: Session State Stored: oauth_state='{stored_state}'")
+
+if auth_code and stored_state: # Check if we have code AND expected a callback
+    print("DEBUG CALLBACK: Processing callback...")
+    if returned_state != stored_state:
         st.error("Invalid state parameter. Authentication failed (CSRF detected).")
+        print("DEBUG CALLBACK: State MISMATCH!")
         st.session_state['oauth_state'] = None # Clear invalid state
     else:
         st.session_state['oauth_state'] = None # Clear state after use
+        print("DEBUG CALLBACK: State OK. Attempting token fetch...")
         try:
-            # Fetch token from Google
             token = client.fetch_token(
                 TOKEN_ENDPOINT,
-                authorization_response=f"{GOOGLE_REDIRECT_URI}?code={auth_code}&state={returned_state}", # Pass full redirect URL
-                # Authlib usually infers code from the auth response URL
-                # client_secret=GOOGLE_CLIENT_SECRET # Often needed, depends on client setup
+                # ... other params
             )
+            print(f"DEBUG CALLBACK: Token received (keys): {token.keys()}") # Check what's in the token
 
-            # Parse and verify ID token (CRITICAL STEP)
-            # Use Authlib's built-in parsing which includes basic validation
-            # For production, add stricter checks (nonce if used, etc.)
             userinfo = client.parse_id_token(token)
+            print(f"DEBUG CALLBACK: Parsed ID token (userinfo): {userinfo}") # See parsed user info
 
-            # --- Additional Verification (Issuer & Audience) ---
-            if userinfo.get('iss') not in ['https://accounts.google.com', 'accounts.google.com']:
-                 raise ValueError("Invalid token issuer.")
-            if userinfo.get('aud') != GOOGLE_CLIENT_ID:
-                 raise ValueError("Invalid token audience.")
-            # Expiry is usually checked by parse_id_token
-
+            # --- Add more prints around DB calls and session state setting ---
             google_id = userinfo.get('sub')
             email = userinfo.get('email')
-            name = userinfo.get('name')
+            print(f"DEBUG CALLBACK: Extracted google_id='{google_id}', email='{email}'")
 
-            if not google_id or not email:
-                st.error("Could not retrieve Google ID or email from token.")
+            user = get_user_by_google_id(google_id)
+            print(f"DEBUG CALLBACK: DB lookup result for user: {user}")
+
+            # ... (rest of the get/add user logic) ...
+            app_user_id_local = ... # Get the ID after DB interaction
+            print(f"DEBUG CALLBACK: Determined app_user_id: {app_user_id_local}")
+
+            if app_user_id_local:
+                print("DEBUG CALLBACK: Setting session state: authenticated=True")
+                st.session_state['authenticated'] = True
+                st.session_state['app_user_id'] = app_user_id_local
+                st.session_state['user_info'] = ... # Store user info
+                print(f"DEBUG CALLBACK: Session state 'authenticated' is now: {st.session_state.get('authenticated')}")
+                # ... (JS cleanup and rerun) ...
             else:
-                # User is verified, get/create user in our database
-                user = get_user_by_google_id(google_id)
-                app_user_id_local = None
-                if user:
-                    app_user_id_local = user['id']
-                    print(f"Existing user logged in via Google: {email} (App ID: {app_user_id_local})")
-                    st.session_state['user_info'] = dict(user) # Store full user record
-                else:
-                    print(f"New user via Google: {email}. Creating account...")
-                    app_user_id_local = add_google_user(google_id, email, name)
-                    if app_user_id_local:
-                         # Fetch the newly created record to store
-                         new_user_record = get_user_by_google_id(google_id)
-                         st.session_state['user_info'] = dict(new_user_record) if new_user_record else None
-                    else:
-                         st.error("Failed to create user account in database.")
-                         # Don't set authenticated if user creation failed
-
-                # If we successfully got/created the user and got an app_user_id
-                if app_user_id_local:
-                     st.session_state['authenticated'] = True
-                     st.session_state['app_user_id'] = app_user_id_local
-                     # Use JavaScript via markdown to clear query params after processing
-                     # This prevents reprocessing on refresh. It's a workaround.
-                     st.markdown(
-                         """
-                         <script>
-                             // Attempt to remove query parameters from URL without reload
-                             if (window.history.replaceState) {
-                                 const url = new URL(window.location.href);
-                                 url.searchParams.delete('code');
-                                 url.searchParams.delete('state');
-                                 url.searchParams.delete('scope'); // Google often adds scope back too
-                                 url.searchParams.delete('authuser');
-                                 url.searchParams.delete('prompt');
-                                 window.history.replaceState({path: url.pathname}, '', url.pathname);
-                             }
-                         </script>
-                         """, unsafe_allow_html=True)
-                     # Trigger immediate rerun to reflect login state without query params
-                     print("DEBUG: Rerunning after successful auth callback.")
-                     st.rerun()
-
+                print("DEBUG CALLBACK: Failed to get/add user, authentication failed.")
 
         except Exception as e:
             st.error(f"Error during OAuth token fetch or validation: {e}")
-            print(f"OAuth Error Details: {e}") # Log detailed error
+            print(f"DEBUG CALLBACK: OAUTH ERROR: {e}") # Log detailed error
+elif auth_code:
+     print("DEBUG CALLBACK: Received auth code, but no state found in session. Ignoring callback.")
+
+# --- Add print at the start of main UI logic ---
+print(f"\nDEBUG UI RENDER: st.session_state.authenticated = {st.session_state.get('authenticated')}")
+if st.session_state.get('authenticated'):
+    # ... render authenticated UI ...
+    print("DEBUG UI RENDER: Rendering authenticated view.")
+else:
+    # ... render login button ...
+     print("DEBUG UI RENDER: Rendering login view.")
 
 # --- Main UI Rendering ---
 

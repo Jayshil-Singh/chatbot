@@ -1,5 +1,3 @@
 streamlit
 openai
 google-generativeai
-bcrypt
-streamlit-authenticator

@@ -17,8 +17,8 @@ DATABASE_NAME = 'chatbot_data_google_auth.db'
 try:
     GOOGLE_CLIENT_ID = st.secrets["GOOGLE_CLIENT_ID"]
     GOOGLE_CLIENT_SECRET = st.secrets["GOOGLE_CLIENT_SECRET"]
-    GOOGLE_REDIRECT_URI = st.secrets["GOOGLE_REDIRECT_URI"] # Must match GCP config exactly
-    APP_SECRET_KEY = st.secrets["APP_SECRET_KEY"] # Used for state validation (CSRF)
+    GOOGLE_REDIRECT_URI = st.secrets["GOOGLE_REDIRECT_URI"]
+    APP_SECRET_KEY = st.secrets["APP_SECRET_KEY"] 
     GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 except KeyError as e:
     st.error(f"ERROR: Missing secret: {e}. Configure in .streamlit/secrets.toml or Cloud Settings.")
@@ -219,10 +219,6 @@ if auth_code and stored_state:
                 TOKEN_ENDPOINT,
                 # Use the authorization_response parameter to pass the full callback URL
                 authorization_response=full_callback_url,
-                # Alternatively, pass code directly if URL method fails:
-                # code=auth_code,
-                # Authlib might require client_secret depending on provider/setup
-                # client_secret=GOOGLE_CLIENT_SECRET # Usually needed for web server flow
             )
             print("Token received.")
 
@@ -384,7 +380,8 @@ else:
         authorization_url, state = client.create_authorization_url(
             AUTHORIZATION_ENDPOINT, state=csrf_state)
         print(f"Generated login link with state: {csrf_state}")
-        st.link_button("Login with Google", authorization_url)
+        # Use st.markdown to create an HTML link explicitly targeting the same tab
+        st.markdown(f'<a href="{authorization_url}" target="_self">Login with Google</a>', unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Error creating login button: {e}")
         print(f"Error during OAuth URL generation: {e}")

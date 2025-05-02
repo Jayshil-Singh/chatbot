@@ -380,8 +380,8 @@ else:
         authorization_url, state = client.create_authorization_url(
             AUTHORIZATION_ENDPOINT, state=csrf_state)
         print(f"Generated login link with state: {csrf_state}")
-        # Use st.markdown to create an HTML link explicitly targeting the same tab
-        st.markdown(f'<a href="{authorization_url}" target="_self">Login with Google</a>', unsafe_allow_html=True)
+        st.link_button("Login with Google", authorization_url)
+        
     except Exception as e:
         st.error(f"Error creating login button: {e}")
         print(f"Error during OAuth URL generation: {e}")

@@ -8,7 +8,9 @@ from typing import List, Dict, Union, Optional, Any
 import json # For parsing token response
 import secrets # For generating state parameter
 from authlib.integrations.requests_client import OAuth2Session # pip install Authlib requests
-
+# Add near the top, after imports
+print(f"DEBUG SCRIPT START: Session state keys: {list(st.session_state.keys())}")
+print(f"DEBUG SCRIPT START: oauth_state in session = {st.session_state.get('oauth_state')}")
 # --- Constants & Config ---
 DATABASE_NAME = 'chatbot_data_google_auth.db' # New DB name for clarity
 

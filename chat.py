@@ -137,9 +137,9 @@ def call_external_api(user_message: str, conversation_history: List[Dict[str, st
 # --- Streamlit UI Code ---
 
 # Set page configuration (do this first)
-st.set_page_config(page_title="Gemini Chatbot", layout="wide")
+st.set_page_config(page_title="Software Engineering Chatbot", layout="wide")
 
-st.title("Chatbot ✨ (Gemini Powered)")
+st.title("Siftware Engineering Chatbot ✨")
 # NEW LINE using st.query_params
 st.caption(f"Created by Jayshil Singh | Location: {st.query_params.get('loc', 'Suva, Fiji')} | Time: {st.query_params.get('time', 'N/A')}")
 

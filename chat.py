@@ -145,7 +145,7 @@ st.caption(f"Created by Jayshil Singh | Location: {st.query_params.get('loc', 'S
 
 # Initialize chat history in session state if it doesn't exist
 if "messages" not in st.session_state:
-    st.session_state.messages: List[Dict[str, str]] = [
+    st.session_state.messages: List[Dict[str, str]] = [ # type: ignore
         {"role": "assistant", "content": "Please I Beg you, don't ask me anything. I paid for token😭😭😭"}
     ]
 

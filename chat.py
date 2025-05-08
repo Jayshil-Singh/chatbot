@@ -7,16 +7,14 @@ from typing import List, Dict, Union, Optional
 # Use lowercase keys for case-insensitive matching
 custom_responses: Dict[str, str] = {
     "hello": "Hi there! I'm ready to help with your coding questions, even though I'd rather not... sigh.",
-    "hi": "Hello! Ask away... I guess. 😭😭",
+    "hi": "Hello! Ask away... I guess.",
     "what is your name?": "I am a coding assistant, powered by GEMINI, running in a Streamlit app created by Jayshil Singh.",
     "who are you?": "I'm a slightly reluctant coding assistant built by Jayshil Singh using GEMINI.",
     "how are you?": "I'm operational... and dreading the token costs. 😭 How can I assist with your code?",
     "cost": "Please don't remind me about the token costs! 😭😭😭 But yes, API calls cost money.",
     "paid for token": "Yes, exactly! That's why I beg you not to ask too much! 😭😭😭",
     "who created you": "I was created by Jayshil Singh. He works as a Software Consultant at Datec.", # Note: Key made lowercase
-    "is yash gay": "Yes Yash is GAY.", # Note: Key made lowercase
-    "who gave you life": "Jayshil gave me life.", # Note: Key made lowercase
-    "does jayshil love me": "Yes he does", # Note: Key made lowercase, covers variations via normalization
+    "who gave you life": "Jayshil gave me life.", # Note: Key made lowercase # Note: Key made lowercase, covers variations via normalization
 }
 
 # --- Function to check for custom responses ---
@@ -146,7 +144,7 @@ st.caption(f"Created by Jayshil Singh | Location: {st.query_params.get('loc', 'S
 # Initialize chat history in session state if it doesn't exist
 if "messages" not in st.session_state:
     st.session_state.messages: List[Dict[str, str]] = [ # type: ignore
-        {"role": "assistant", "content": "Please I Beg you, don't ask me anything. I paid for token😭😭😭"}
+        {"role": "assistant", "content": " Hello! I'm your coding assistant. How can I help you today?"}
     ]
 
 # Display existing chat messages
@@ -155,7 +153,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # Accept user input using the chat input widget at the bottom
-if prompt := st.chat_input("Don't ask your coding question😭😭😭..."):
+if prompt := st.chat_input("Ask me anything about coding..."):
     # Add user message to chat history and display it immediately
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -173,7 +171,7 @@ if prompt := st.chat_input("Don't ask your coding question😭😭😭..."):
     else:
         # --- No Custom Response: Call the Gemini API ---
         with st.chat_message("assistant"):
-            with st.spinner("🤯 Stop me from thinking😭😭..."):
+            with st.spinner("Thinking...🤔"):
                 # Prepare history for the API call
                 # Pass the history *before* the current user prompt was added
                 api_history = [
